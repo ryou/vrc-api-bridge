@@ -12,6 +12,7 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
     protected $except = [
-        //
+        // Originを制限する対策をしているので、トークンによる対策はしない
+        "*"
     ];
 }

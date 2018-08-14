@@ -228,4 +228,7 @@ return [
 
     ],
 
+    // 許可オリジン
+    'allow-origin' => env('ALLOW_ORIGIN', ''),
+
 ];
