@@ -15,8 +15,15 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request, $id, $password)
+    public function login(Request $request)
     {
+        // 入力チェック
+        if (!$request->has(["id", "password"])) {
+            return response(json_encode([ "message" => "input id and password" ]), 401);
+        }
+        $id = $request->id;
+        $password = $request->password;
+
         $request->session()->put('id', $id);
         $request->session()->put('password', $password);
 
