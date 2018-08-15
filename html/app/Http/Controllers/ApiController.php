@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
 {
@@ -62,12 +63,57 @@ class ApiController extends Controller
 
     public function getWorldInfo(Request $request, $worldId)
     {
-        $response = ApiController::getApiWithAuth(
-            $request,
-            "worlds/${worldId}"
-        );
+        $oneHourAgo = DB::raw('SUBDATE(NOW(), INTERVAL 1 HOUR)');
 
-        return response($response["body"], $response["code"]);
+        // 1時間以内にDBに登録されたデータがあればそれを使用
+        $world = DB::table('worlds')->where('id', $worldId)->whereTime('updated_at', '>=', $oneHourAgo)->first();
+        $body = null;
+        $code = "200";
+
+        if (is_null($world))
+        {
+            $response = ApiController::getApiWithAuth(
+                $request,
+                "worlds/${worldId}"
+            );
+
+            if ($response["code"] == "200") {
+                $now = DB::raw('NOW()');
+                $willUpdate = DB::table("worlds")->where("id", $worldId)->exists();
+
+                if ($willUpdate)
+                {
+                    DB::table('worlds')
+                        ->where("id", $worldId)
+                        ->update(
+                            [
+                                'json' => $response["body"],
+                                'updated_at' => $now,
+                            ]
+                        );
+                }
+                else
+                {
+                    DB::table('worlds')
+                        ->insert(
+                            [
+                                'id' => $worldId,
+                                'json' => $response["body"],
+                                'updated_at' => $now,
+                                'created_at' => $now,
+                            ]
+                        );
+                }
+            }
+            $body = $response["body"];
+            $code = $response["code"];
+        }
+        else
+        {
+            $body = $world->json;
+        }
+
+        return response($body, $code);
     }
 
     public function getWorldInfoByInstanceId(Request $request, $worldId, $instanceId)
