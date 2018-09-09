@@ -9,10 +9,10 @@ class ApiController extends Controller
 {
     public static function getHttpClient()
     {
-        $baseUrl = "https://api.vrchat.cloud/api/1/";
+        $baseUri = config("app.vrc-api-base-uri");
 
         return new \GuzzleHttp\Client([
-            "base_uri" => $baseUrl,
+            "base_uri" => $baseUri,
         ]);
     }
 

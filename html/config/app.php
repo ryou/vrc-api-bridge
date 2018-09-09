@@ -231,4 +231,7 @@ return [
     // 許可オリジン
     'allow-origin' => env('ALLOW_ORIGIN', ''),
 
+    // VRChatAPIへのURI
+    'vrc-api-base-uri' => env('VRC_API_BASE_URI', ''),
+
 ];
