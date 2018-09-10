@@ -16,7 +16,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public static function getApiWithAuth(Request $request, $action, $params = [])
+    public static function getApiWithAuth(Request $request, string $action, array $params = [])
     {
         $apiKey = $request->session()->get('apiKey');
         $id = $request->session()->get('id');
@@ -40,14 +40,14 @@ class ApiController extends Controller
         ];
     }
 
-    public function getUserByName(Request $request, $name)
+    public function getUserByName(Request $request, string $name)
     {
         $response = ApiController::getApiWithAuth($request, "users/${name}/name");
 
         return response($response["body"], $response["code"]);
     }
 
-    public function getFriends(Request $request, $offline = "false")
+    public function getFriends(Request $request, string $offline = "false")
     {
         $response = ApiController::getApiWithAuth(
             $request,
@@ -61,7 +61,7 @@ class ApiController extends Controller
         return response($response["body"], $response["code"]);
     }
 
-    public function getWorldInfo(Request $request, $worldId)
+    public function getWorldInfo(Request $request, string $worldId)
     {
         $oneHourAgo = DB::raw('SUBDATE(NOW(), INTERVAL 1 HOUR)');
 
@@ -116,7 +116,7 @@ class ApiController extends Controller
         return response($body, $code);
     }
 
-    public function getWorldInfoByInstanceId(Request $request, $worldId, $instanceId)
+    public function getWorldInfoByInstanceId(Request $request, string $worldId, string $instanceId)
     {
         $response = ApiController::getApiWithAuth(
             $request,
