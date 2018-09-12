@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\World;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -63,57 +66,38 @@ class ApiController extends Controller
 
     public function getWorldInfo(Request $request, string $worldId)
     {
-        $oneHourAgo = DB::raw('SUBDATE(NOW(), INTERVAL 1 HOUR)');
+        $world = null;
+        try
+        {
+            $world = World::findOrFail($worldId);
+        }
+        catch (ModelNotFoundException $e)
+        {
+            $world = new World([
+                "id" => $worldId
+            ]);
+        }
 
-        // 1時間以内にDBに登録されたデータがあればそれを使用
-        $world = DB::table('worlds')->where('id', $worldId)->whereTime('updated_at', '>=', $oneHourAgo)->first();
-        $body = null;
+        // 新規作成時か古い情報の際に、更新する
+        $updatedAt = $world->updated_at;
+        $beforeOneHour = Carbon::now()->subHour();
         $code = "200";
-
-        if (is_null($world))
+        if ($updatedAt === null || $beforeOneHour > $updatedAt)
         {
             $response = ApiController::getApiWithAuth(
                 $request,
                 "worlds/${worldId}"
             );
 
-            if ($response["code"] == "200") {
-                $now = DB::raw('NOW()');
-                $willUpdate = DB::table("worlds")->where("id", $worldId)->exists();
-
-                if ($willUpdate)
-                {
-                    DB::table('worlds')
-                        ->where("id", $worldId)
-                        ->update(
-                            [
-                                'json' => $response["body"],
-                                'updated_at' => $now,
-                            ]
-                        );
-                }
-                else
-                {
-                    DB::table('worlds')
-                        ->insert(
-                            [
-                                'id' => $worldId,
-                                'json' => $response["body"],
-                                'updated_at' => $now,
-                                'created_at' => $now,
-                            ]
-                        );
-                }
-            }
-            $body = $response["body"];
             $code = $response["code"];
-        }
-        else
-        {
-            $body = $world->json;
+            if ($code !== "200")
+            {
+                $world->json = $response["body"];
+                $world->save();
+            }
         }
 
-        return response($body, $code);
+        return response($world->json, $code);
     }
 
     public function getWorldInfoByInstanceId(Request $request, string $worldId, string $instanceId)

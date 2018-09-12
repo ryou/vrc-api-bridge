@@ -19,5 +19,5 @@ use Illuminate\Database\Eloquent\Model;
  */
 class World extends Model
 {
-    //
+    protected $fillable = [ 'id', 'json' ];
 }
