@@ -14,7 +14,8 @@
 Route::post('/auth/login', 'AuthController@login');
 Route::get('/auth/logout', 'AuthController@logout');
 
-Route::get('/api/users/{name}/name', 'ApiController@getUserByName');
-Route::get('/api/friends/{offline}', 'ApiController@getFriends');
-Route::get('/api/worlds/{worldId}', 'ApiController@getWorldInfo');
-Route::get('/api/worlds/{worldId}/{instanceId}', 'ApiController@getWorldInfoByInstanceId');
+Route::get('/api/1/users/{name}/name', 'ApiController@getUserByName');
+Route::get('/api/1/auth/user/friends', 'ApiController@getFriends');
+Route::get('/api/1/worlds/{worldId}', 'ApiController@getWorldInfo');
+Route::get('/api/1/worlds/{worldId}/{instanceId}', 'ApiController@getWorldInfoByInstanceId');
+Route::get('/api/1/favorites', 'ApiController@getFavorites');

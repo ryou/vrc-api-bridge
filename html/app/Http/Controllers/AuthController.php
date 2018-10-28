@@ -8,7 +8,7 @@ class AuthController extends Controller
 {
     public static function getHttpClient()
     {
-        $baseUrl = "https://api.vrchat.cloud/api/1/";
+        $baseUrl = config("app.vrc-api-base-uri");
 
         return new \GuzzleHttp\Client([
             "base_uri" => $baseUrl,
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
         $response = AuthController::getHttpClient()->request(
             "GET",
-            "config",
+            "/api/1/config",
             [ "http_errors" => false ]
         );
         $body = (string)$response->getBody();

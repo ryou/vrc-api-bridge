@@ -29,7 +29,7 @@ class ApiController extends Controller
 
         $response = ApiController::getHttpClient()->request(
             "GET",
-            $action,
+            "/api/1/" . $action,
             [
                 "auth" => [$id, $password],
                 "query" => $query,
@@ -50,15 +50,12 @@ class ApiController extends Controller
         return response($response["body"], $response["code"]);
     }
 
-    public function getFriends(Request $request, string $offline = "false")
+    public function getFriends(Request $request)
     {
         $response = ApiController::getApiWithAuth(
             $request,
             "auth/user/friends",
-            [
-                "n" => "100",
-                "offline" => $offline,
-            ]
+            $request->input()
         );
 
         return response($response["body"], $response["code"]);
@@ -105,6 +102,17 @@ class ApiController extends Controller
         $response = ApiController::getApiWithAuth(
             $request,
             "worlds/${worldId}/${instanceId}"
+        );
+
+        return response($response["body"], $response["code"]);
+    }
+
+    public function getFavorites(Request $request)
+    {
+        $response = ApiController::getApiWithAuth(
+            $request,
+            "favorites",
+            $request->input()
         );
 
         return response($response["body"], $response["code"]);
